@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head>
+
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">
+                Hello World
+            </h1>
+            <p class="subtitle">
+                This is an example of how to configure a web page to receive web notifications with firebase 9.8.1
+            </p>
+        </div>
+    </section>
+    <script>
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-analytics.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-messaging.js";
+
+        const firebase = initializeApp({
+            "FIREBASE": "CONFIGURATION"
+        });
+
+        const messaging = getMessaging(firebase);
+        //Request notifications permission and get token
+        const token = getToken(messaging, { vapidKey: "BJS8dIOM6NC0sBs_0BYE-...lwR2ccIuQiOXfkGj4fdsfdjikskCc" })
+            .then((response) => {
+                userToken = response;
+                console.log(userToken);
+            });
+
+        //Enable receiving messages in the foreground
+        onMessage(messaging, (payload) => {
+            console.log('[firebase-messaging-sw.js] Received message in the foreground', payload);
+            // Show notification in screen
+            navigator.serviceWorker.register('firebase-messaging-sw.js');
+            navigator.serviceWorker.ready.then((registration) => {
+                registration.showNotification(payload.data.title, {
+                    body: payload.data.message,
+                    data: payload.data
+                });
+            });
+        })
+    </script>
+</body>
+
+</html>
